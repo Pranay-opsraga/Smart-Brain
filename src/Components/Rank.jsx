@@ -1,8 +1,8 @@
-const Rank = () => {
+const Rank = ({ name, entries }) => {
     return (
-        <div className="text-2xl flex flex-col items-center">
-            <p>Pranay,your rank is...</p>
-            <p className="font-bold text-white">#5</p>
+        <div className="rank-container">
+            <p>{name}, your current entry count is...</p>
+            <p className="rank-number">#{entries}</p>
         </div>
     )
 }

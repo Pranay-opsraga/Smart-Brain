@@ -1,8 +1,8 @@
 const NavBar = ({ isSignedIn, onRouteChange }) => {
     return (
-        <nav className="flex justify-end p-4 shadow-lg">
+        <nav className="navbar">
             {isSignedIn && (
-                <p className="text-xl hover:opacity-50 underline cursor-pointer" onClick={() => onRouteChange('SignOut')}>Sign Out</p>
+                <span className="navbar-link" onClick={() => onRouteChange('signout')}>Sign Out</span>
             )}
         </nav>
     );

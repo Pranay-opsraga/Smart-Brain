@@ -6,27 +6,52 @@ import ImageLinkForm from "./Components/ImageLinkForm";
 import FaceRecognition from "./Components/FaceRecognition";
 import Particles from "./Components/Particles";
 import SignIn from "./Components/signIn";
+import SignUp from "./Components/signUp";
 import * as faceapi from "@vladmandic/face-api";
 
 const App = () => {
   const [input, setInput] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [boxes, setBoxes] = useState([]); // To store an array of face box coordinates
-  const [route, setRoute] = useState('SignIn');
-  const [IsSignedIn, setIsSignedIn] = useState(false);
+  // Restore session from localStorage on load
+  const savedUser = JSON.parse(localStorage.getItem('smartBrainUser'));
+  const [route, setRoute] = useState(savedUser ? 'home' : 'signin');
+  const [IsSignedIn, setIsSignedIn] = useState(savedUser ? true : false);
+  const [user, setUser] = useState(savedUser || {
+    id: '',
+    name: '',
+    email: '',
+    entries: 0,
+    joined: ''
+  });
+
+  const loadUser = (data) => {
+    const userData = {
+      id: data.id,
+      name: data.name,
+      email: data.email,
+      entries: data.entries,
+      joined: data.joined
+    };
+    setUser(userData);
+    localStorage.setItem('smartBrainUser', JSON.stringify(userData));
+  }
 
   const onRouteChange = (route) => {
-    if (route == 'SignOut') {
-      setIsSignedIn(false)
-      setRoute('SignIn');
-    } else if (route == 'SignIn') {
-      setIsSignedIn(true);
-      setRoute('Home');
-    } else if (route == 'Home') {
+    if (route === 'signout') {
       setIsSignedIn(false);
-      setRoute('SignIn');
+      setRoute('signin');
+      setUser({ id: '', name: '', email: '', entries: 0, joined: '' });
+      localStorage.removeItem('smartBrainUser');
+    } else {
+      if (route === 'home') {
+        setIsSignedIn(true);
+      }
+      setRoute(route);
     }
   }
+
+
 
   // Load face-api models from CDN when the component mounts
   useEffect(() => {
@@ -39,7 +64,7 @@ const App = () => {
       } catch (err) {
         console.error("Error loading face-api models:", err);
       }
-    };
+    }
     loadModels();
   }, []);
 
@@ -83,6 +108,23 @@ const App = () => {
   const onButtonSubmit = () => {
     setBoxes([]); // Reset the boxes array for the new image
     setImageUrl(input);
+    // Update entries on the server
+    fetch('http://localhost:3001/image', {
+      method: 'put',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: user.email })
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          setUser(prev => {
+            const updated = { ...prev, entries: data.entries };
+            localStorage.setItem('smartBrainUser', JSON.stringify(updated));
+            return updated;
+          });
+        }
+      })
+      .catch(err => console.error('Error updating entries:', err));
   };
 
   return (
@@ -112,13 +154,13 @@ const App = () => {
       </div>
       <div style={{ position: "relative", zIndex: 1 }}>
         <NavBar isSignedIn={IsSignedIn} onRouteChange={onRouteChange} />
-        {route === 'Home' ? (
+        {route === 'home' ? (
           <>
-            <div className="flex sm:justify-center justify-start">
+            <div className="logo-wrapper">
               <Logo />
             </div>
-            <div className="flex justify-center">
-              <Rank />
+            <div className="flex-center">
+              <Rank name={user.name} entries={user.entries} />
             </div>
             <ImageLinkForm
               onInputChange={onInputChange}
@@ -126,8 +168,10 @@ const App = () => {
             />
             <FaceRecognition imageUrl={imageUrl} boxes={boxes} onImageLoad={onImageLoad} />
           </>
+        ) : route === 'signup' ? (
+          <SignUp onRouteChange={onRouteChange} />
         ) : (
-          <SignIn onRouteChange={onRouteChange} />
+          <SignIn loadUser={loadUser} onRouteChange={onRouteChange} />
         )}
       </div>
     </div>
