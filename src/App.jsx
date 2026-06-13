@@ -170,7 +170,7 @@ const App = () => {
               onInputChange={onInputChange}
               onButtonSubmit={onButtonSubmit}
             />
-            <FaceRecognition imageUrl={imageUrl} boxes={boxes} onImageLoad={onImageLoad} onRouteChange={onRouteChange} />
+            <FaceRecognition imageUrl={imageUrl} boxes={boxes} onImageLoad={onImageLoad} />
           </>
         ) : route === 'signup' ? (
           <SignUp onRouteChange={onRouteChange} />

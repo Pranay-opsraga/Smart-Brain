@@ -9,13 +9,5 @@ export default defineConfig({
       errorRecovery: true
     }
   },
-  server: {
-    proxy: {
-      '/v2': {
-        target: 'https://api.clarifai.com',
-        changeOrigin: true,
-        secure: false
-      }
-    }
-  }
+
 })
