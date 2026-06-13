@@ -1,4 +1,4 @@
-const ImageLinkForm = ({ onInputChange, onButtonSubmit }) => {
+const ImageLinkForm = ({ onInputChange, onButtonSubmit, }) => {
     return (
         <div className="image-form-container">
             <p>This Magic Brain will detect faces in your pictures. Give it a try.</p>

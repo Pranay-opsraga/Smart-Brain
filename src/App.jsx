@@ -112,7 +112,7 @@ const App = () => {
     fetch('http://localhost:3001/image', {
       method: 'put',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: user.email })
+      body: JSON.stringify({ id: user.id })
     })
       .then(response => response.json())
       .then(data => {
