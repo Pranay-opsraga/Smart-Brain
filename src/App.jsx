@@ -17,13 +17,14 @@ const App = () => {
   const savedUser = JSON.parse(localStorage.getItem('smartBrainUser'));
   const [route, setRoute] = useState(savedUser ? 'home' : 'signin');
   const [IsSignedIn, setIsSignedIn] = useState(savedUser ? true : false);
-  const [user, setUser] = useState(savedUser || {
+  const initialUser = {
     id: '',
     name: '',
     email: '',
     entries: 0,
     joined: ''
-  });
+  }
+  const [user, setUser] = useState(savedUser || initialUser);
 
   const loadUser = (data) => {
     const userData = {
@@ -41,7 +42,10 @@ const App = () => {
     if (route === 'signout') {
       setIsSignedIn(false);
       setRoute('signin');
-      setUser({ id: '', name: '', email: '', entries: 0, joined: '' });
+      setUser(initialUser);
+      setImageUrl('');
+      setInput('');
+      setBoxes([]);
       localStorage.removeItem('smartBrainUser');
     } else {
       if (route === 'home') {
@@ -166,7 +170,7 @@ const App = () => {
               onInputChange={onInputChange}
               onButtonSubmit={onButtonSubmit}
             />
-            <FaceRecognition imageUrl={imageUrl} boxes={boxes} onImageLoad={onImageLoad} />
+            <FaceRecognition imageUrl={imageUrl} boxes={boxes} onImageLoad={onImageLoad} onRouteChange={onRouteChange} />
           </>
         ) : route === 'signup' ? (
           <SignUp onRouteChange={onRouteChange} />
